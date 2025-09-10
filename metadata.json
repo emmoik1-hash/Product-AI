@@ -1,0 +1,5 @@
+{
+  "name": "Product Descriptions AI",
+  "description": "An AI-powered tool to automatically generate SEO-optimized product descriptions in multiple languages for e-commerce platforms. Input a product name and features to receive multiple description variants and SEO metadata.",
+  "requestFramePermissions": []
+}
