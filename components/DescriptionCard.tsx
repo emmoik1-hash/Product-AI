@@ -18,7 +18,7 @@ export const DescriptionCard: React.FC<DescriptionCardProps> = ({ title, text })
   };
 
   return (
-    <div className="bg-neutral-900 p-4 rounded-lg border border-neutral-700">
+    <div className="bg-neutral-900 p-4 rounded-lg border border-neutral-700 transition-all duration-300 hover:border-primary hover:shadow-lg hover:shadow-primary/10">
       <div className="flex justify-between items-start mb-2">
         <h4 className="font-semibold text-gray-300">{title}</h4>
         <button

@@ -207,11 +207,12 @@ export const BulkUpload: React.FC = () => {
   }
   
   if (results.length > 0) {
-      const successCount = results.filter(r => !r.error).length;
+      const successes = results.filter(r => !r.error);
+      const failures = results.filter(r => r.error);
       return (
-        <div className="bg-neutral-800 p-8 rounded-xl shadow-lg text-center">
+        <div className="bg-neutral-800 p-8 rounded-xl shadow-lg text-center max-w-3xl mx-auto">
              <h2 className="text-2xl font-bold mb-2">Processing Complete!</h2>
-             <p className="text-gray-300 mb-6">Successfully generated descriptions for {successCount} of {results.length} products.</p>
+             <p className="text-gray-300 mb-6">Successfully generated descriptions for {successes.length} of {results.length} products.</p>
              <div className="flex flex-wrap justify-center gap-4">
                 <button
                     onClick={handleDownloadCSV}
@@ -234,6 +235,20 @@ export const BulkUpload: React.FC = () => {
                     Start Over
                 </button>
              </div>
+             
+            {failures.length > 0 && (
+                <div className="mt-8 text-left bg-neutral-900/50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-red-400 mb-3">Failed Products ({failures.length}):</h3>
+                    <ul className="space-y-2 max-h-48 overflow-y-auto text-sm">
+                        {failures.map((fail, index) => (
+                            <li key={index} className="p-2 bg-neutral-700/50 rounded">
+                                <p className="font-semibold text-white">{fail.product_name}</p>
+                                <p className="text-red-400/80 italic text-xs">{fail.error}</p>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </div>
       )
   }

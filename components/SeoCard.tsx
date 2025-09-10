@@ -18,7 +18,7 @@ export const SeoCard: React.FC<SeoCardProps> = ({ title, content }) => {
   };
   
   return (
-    <div className="bg-neutral-900 p-4 rounded-lg border border-neutral-700">
+    <div className="bg-neutral-900 p-4 rounded-lg border border-neutral-700 transition-all duration-300 hover:border-primary hover:shadow-lg hover:shadow-primary/10">
       <div className="flex justify-between items-center mb-2">
         <h5 className="font-medium text-gray-400">{title}</h5>
         <button

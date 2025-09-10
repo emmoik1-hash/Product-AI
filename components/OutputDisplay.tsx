@@ -3,7 +3,6 @@ import React from 'react';
 import type { GenerateApiResponse } from '../types';
 import { DescriptionCard } from './DescriptionCard';
 import { SeoCard } from './SeoCard';
-import { DownloadIcon } from './icons/DownloadIcon';
 
 interface OutputDisplayProps {
   data: GenerateApiResponse | null;
@@ -43,50 +42,17 @@ const ErrorDisplay = ({ message }: { message: string }) => (
 
 
 export const OutputDisplay: React.FC<OutputDisplayProps> = ({ data, isLoading, error }) => {
-  const handleExport = () => {
-    if (!data) return;
-
-    const headers = "type,content\n";
-    let csvContent = headers;
-
-    data.descriptions.forEach((desc, i) => {
-        csvContent += `"description_${i + 1}","${desc.replace(/"/g, '""')}"\n`;
-    });
-
-    csvContent += `"meta_title","${data.seo.metaTitle.replace(/"/g, '""')}"\n`;
-    csvContent += `"meta_description","${data.seo.metaDescription.replace(/"/g, '""')}"\n`;
-    csvContent += `"keywords","${data.seo.keywords.join(', ').replace(/"/g, '""')}"\n`;
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", "product_descriptions.csv");
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-  };
-
+  
   const renderContent = () => {
     if (isLoading) return <LoadingSpinner />;
     if (error) return <ErrorDisplay message={error} />;
     if (!data) return <Placeholder />;
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 animate-fade-in">
         <div>
           <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold text-white">Generated Descriptions</h3>
-              <button
-                onClick={handleExport}
-                className="flex items-center space-x-2 text-sm bg-neutral-700 hover:bg-neutral-600 text-gray-200 font-medium py-2 px-3 rounded-md transition-colors"
-                >
-                <DownloadIcon />
-                <span>Export CSV</span>
-              </button>
           </div>
           <div className="space-y-4">
             {data.descriptions.map((desc, index) => (

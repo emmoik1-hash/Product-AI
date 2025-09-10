@@ -47,13 +47,15 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="bg-primary p-2 rounded-lg">
-                <svg xmlns="http://www.w.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 3.375c-1.426 0-2.693.422-3.834 1.148m13.097 4.5c-.317-.052-.64-.092-1.002-.102m-11.5 0c-.362.01-.72.05-1.002.102m13.5 0c.373 0 .74.018 1.102.052m-13.5 0c-.362-.034-.72-.052-1.102-.052m12.397 0c.317.052.64.092 1.002.102M3.375 9.75c.01.362.034.72.052 1.102m0 0c0 .373-.018.74-.052 1.102m0 0c-.052.317-.092.64-.102 1.002m0 0c.01.362.034.72.052 1.102m0 0c.034.362.052.72.052 1.102m0 0c.052.317.092.64.102 1.002m11.5 0c.362-.01.72-.05 1.002-.102m-13.5 0c-.373 0-.74-.018-1.102-.052m13.5 0c.362.034.72.052 1.102.052m-12.397 0c-.317-.052-.64-.092-1.002-.102m11.5 0c-.362.01-.72.05-1.002.102M12 4.5c-4.142 0-7.5 3.358-7.5 7.5s3.358 7.5 7.5 7.5 7.5-3.358 7.5-7.5-3.358-7.5-7.5-7.5Z" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM12 12V3m0 9H3m9 0h9" />
                 </svg>
             </div>
             <h1 className="text-2xl font-bold tracking-tight">Product Descriptions AI</h1>
           </div>
-          <span className="text-sm text-gray-400">Powered by Gemini</span>
+           <div className="font-semibold text-sm bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+             Powered by Gemini
+           </div>
         </div>
       </header>
 
@@ -76,8 +78,9 @@ const App: React.FC = () => {
             </button>
           </div>
         </div>
-
-        {mode === 'single' ? renderSingleMode() : <BulkUpload />}
+        <div key={mode} className="animate-fade-in">
+          {mode === 'single' ? renderSingleMode() : <BulkUpload />}
+        </div>
       </main>
     </div>
   );
