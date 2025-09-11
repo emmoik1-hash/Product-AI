@@ -1,20 +1,26 @@
+
 import { createClient } from '@supabase/supabase-js';
 
-// These variables should be set in your environment variables.
-// Fallback to placeholder values to prevent the app from crashing during startup
-// if the environment variables are not injected into the client-side code.
-// Authentication will not work with these placeholder values.
-const supabaseUrl = process.env.SUPABASE_URL || "https://dummy-project-url.supabase.co";
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || "dummy-anon-key";
+// NOTE: Vercel injects environment variables during the build process.
+// These variables must be configured in the Vercel project settings.
+// We use NEXT_PUBLIC_ prefix by convention.
+// Ensure these are set in your Vercel dashboard.
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+// This flag helps the AuthContext provide a user-friendly error
+// if the environment variables are not configured in Vercel.
+export const isSupabaseMisconfigured = !supabaseUrl || !supabaseAnonKey;
+
+if (isSupabaseMisconfigured) {
+    // This warning is for the developer console.
     console.warn(
-        "Supabase environment variables (SUPABASE_URL, SUPABASE_ANON_KEY) are not set. " +
-        "The application will use placeholder values, and authentication will not function correctly. " +
-        "Please configure these environment variables for full functionality."
+        "Supabase credentials are not configured in your environment variables. " +
+        "Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your Vercel project settings. " +
+        "Authentication will not function correctly."
     );
 }
 
 // Create and export the Supabase client.
-// The createClient function requires non-empty strings, even if they are placeholders.
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// The createClient function requires non-empty strings, so we provide fallbacks.
+export const supabase = createClient(supabaseUrl || "", supabaseAnonKey || "");

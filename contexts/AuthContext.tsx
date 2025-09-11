@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { supabase, isSupabaseMisconfigured } from '../lib/supabaseClient';
 // FIX: The type for a session in Supabase v2 is `Session`, not `AuthSession` (which is from v1).
 // Using the incorrect type from a previous version can cause type resolution issues for the entire auth client.
 import type { Session } from '@supabase/supabase-js';
@@ -29,6 +29,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const fetchSessionAndProfile = async () => {
       setLoading(true);
       setAuthError(null);
+
+      if (isSupabaseMisconfigured) {
+        setAuthError("Authentication is not configured correctly. Please contact this site's administrator.");
+        setLoading(false);
+        setSession(null);
+        setProfile(null);
+        return;
+      }
+
       try {
         // FIX: This is the correct v2 API call. The error was likely due to a type mismatch caused by importing `AuthSession`.
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
