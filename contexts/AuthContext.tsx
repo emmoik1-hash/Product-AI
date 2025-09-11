@@ -13,6 +13,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   incrementUsage: () => void;
   loading: boolean;
+  authError: string | null;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,26 +23,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSessionAndProfile = async () => {
       setLoading(true);
-      // FIX: This is the correct v2 API call. The error was likely due to a type mismatch caused by importing `AuthSession`.
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
+      setAuthError(null);
+      try {
+        // FIX: This is the correct v2 API call. The error was likely due to a type mismatch caused by importing `AuthSession`.
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
 
-      if (session?.user) {
-        const { data: userProfile, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-        if (error && error.code !== 'PGRST116') { // PGRST116 is 'not found'
-          console.error('Error fetching profile:', error);
+        setSession(session);
+
+        if (session?.user) {
+          const { data: userProfile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          if (profileError && profileError.code !== 'PGRST116') { // PGRST116 is 'not found'
+            throw profileError;
+          }
+          setProfile(userProfile);
         }
-        setProfile(userProfile);
+      } catch (error) {
+        console.error('Authentication Error:', error);
+        if (error instanceof Error && error.message.toLowerCase().includes('fetch')) {
+            setAuthError('Failed to connect to authentication service. Please check your internet connection.');
+        } else {
+            setAuthError('An unexpected error occurred during authentication.');
+        }
+        setSession(null);
+        setProfile(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchSessionAndProfile();
@@ -120,7 +137,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [profile]);
   
-  const value = { session, profile, signInWithMagicLink, signOut, incrementUsage, loading };
+  const value = { session, profile, signInWithMagicLink, signOut, incrementUsage, loading, authError };
 
   return (
     <AuthContext.Provider value={value}>

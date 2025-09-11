@@ -50,7 +50,12 @@ export async function generateContent(
   } catch (error) {
     console.error("Error calling our API proxy:", error);
     // Re-throw the error so it can be caught by the UI component and displayed to the user.
-    const friendlyMessage = error instanceof Error ? error.message : "An unknown error occurred while contacting our server.";
+    let friendlyMessage = "An unknown error occurred while contacting our server.";
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        friendlyMessage = "Network error: Could not connect to the server. Please check your internet connection and try again.";
+    } else if (error instanceof Error) {
+        friendlyMessage = error.message;
+    }
     throw new Error(friendlyMessage);
   }
 }

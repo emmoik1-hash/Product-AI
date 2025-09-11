@@ -17,7 +17,7 @@ const App: React.FC = () => {
   const [generatedData, setGeneratedData] = useState<GenerateApiResponse | null>(null);
   const [mode, setMode] = useState<'single' | 'bulk' | 'contact'>('single');
 
-  const { profile, signOut, incrementUsage, loading: isAuthLoading } = useAuth();
+  const { profile, signOut, incrementUsage, loading: isAuthLoading, authError } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const isLimitReached = profile ? profile.usage_count >= USAGE_LIMIT : true;
@@ -112,6 +112,12 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-neutral-900 text-white font-sans">
        {isAuthModalOpen && (
         <AuthModal onClose={() => setIsAuthModalOpen(false)} />
+      )}
+      {authError && (
+        <div className="bg-red-800 text-white text-center p-3 sticky top-0 z-50" role="alert">
+          <p className="font-semibold">Connection Error</p>
+          <p className="text-sm">{authError}</p>
+        </div>
       )}
       <header className="py-6 px-4 md:px-8 border-b border-gray-700">
         <div className="max-w-7xl mx-auto flex items-center justify-between">

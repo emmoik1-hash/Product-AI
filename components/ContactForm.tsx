@@ -42,7 +42,13 @@ export const ContactForm: React.FC = () => {
       setTimeout(() => setIsSubmitted(false), 6000);
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send message. Please try again.');
+      let errorMessage = 'Failed to send message. Please try again.';
+      if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
+          errorMessage = "Network error: Could not send message. Please check your internet connection.";
+      } else if (err instanceof Error) {
+          errorMessage = err.message;
+      }
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
