@@ -1,91 +1,56 @@
-import { GoogleGenAI, Type } from "@google/genai";
+// services/geminiService.ts
 import type { GenerateApiResponse, ProductInfo } from "../types";
 
-const API_KEY = process.env.API_KEY;
-
-if (!API_KEY) {
-  throw new Error("API_KEY environment variable not set");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
-
-const responseSchema = {
-  type: Type.OBJECT,
-  properties: {
-    descriptions: {
-      type: Type.ARRAY,
-      items: { type: Type.STRING },
-      description: "An array of 2-3 different product descriptions.",
-    },
-    seo: {
-      type: Type.OBJECT,
-      properties: {
-        metaTitle: {
-          type: Type.STRING,
-          description: "An SEO-optimized meta title for the product page.",
-        },
-        metaDescription: {
-          type: Type.STRING,
-          description: "An SEO-optimized meta description for the product page.",
-        },
-        keywords: {
-          type: Type.ARRAY,
-          items: { type: Type.STRING },
-          description: "An array of relevant keywords for SEO.",
-        },
-      },
-      required: ["metaTitle", "metaDescription", "keywords"],
-    },
-  },
-  required: ["descriptions", "seo"],
-};
-
+/**
+ * Sends product information to our secure backend API proxy, which then calls the Gemini API.
+ * This function no longer calls the Gemini API directly, protecting the API key.
+ * @param productInfo - The product data to be sent for description generation.
+ * @returns A promise that resolves to the generated descriptions and SEO data.
+ */
 export async function generateProductDescriptions(
   productInfo: ProductInfo
 ): Promise<GenerateApiResponse> {
-  const { productName, description, tone, language } = productInfo;
-
-  const prompt = `
-    You are an expert e-commerce copywriter and SEO specialist.
-    Your task is to analyze an existing product description, identify its key features, and then generate improved, compelling product descriptions and SEO metadata.
-
-    Analyze this existing product information:
-    - Product Name: ${productName}
-    - Existing Description / Details to Analyze: ${description}
-
-    Your goal is to rewrite and improve upon this. Follow these instructions carefully:
-    1.  From the provided details, generate 2-3 new, distinct, and engaging product descriptions.
-    2.  Adopt the following tone of voice: ${tone}.
-    3.  Create a concise, SEO-friendly meta title for the product.
-    4.  Write a compelling meta description that encourages clicks.
-    5.  Provide a list of relevant keywords based on the product.
-    6.  Ensure all generated content is in the specified target language: ${language}.
-  `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: responseSchema,
+    // Call our own API endpoint, which acts as a secure proxy.
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify(productInfo),
     });
-    
-    const text = response.text.trim();
-    const data = JSON.parse(text);
 
-    // Basic validation
+    if (!response.ok) {
+      // The server responded with an error status code.
+      // We try to parse the response body for a specific error message.
+      let errorMessage = `API request failed with status: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        // If the backend provided a specific error message, use it.
+        if (errorData && typeof errorData.error === 'string') {
+          errorMessage = errorData.error;
+        }
+      } catch (jsonError) {
+        // Response was not JSON or was empty. The status code is the best info we have.
+        console.warn("Could not parse JSON from error response.", jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+
+    // Basic validation on the response from our proxy.
     if (!data.descriptions || !data.seo) {
-        throw new Error("Invalid response structure from API.");
+        throw new Error("Invalid response structure from our API proxy.");
     }
 
     return data as GenerateApiResponse;
 
   } catch (error) {
-    console.error("Error calling Gemini API:", error);
-    throw new Error(
-      "Failed to generate descriptions. The AI model may be temporarily unavailable."
-    );
+    console.error("Error calling our API proxy:", error);
+    // Re-throw the error so it can be caught by the UI component and displayed to the user.
+    const friendlyMessage = error instanceof Error ? error.message : "An unknown error occurred while contacting our server.";
+    throw new Error(friendlyMessage);
   }
 }
