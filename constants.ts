@@ -4,6 +4,12 @@ export const TONES = [
   { value: 'friendly', label: 'Friendly' },
   { value: 'creative', label: 'Creative' },
   { value: 'premium', label: 'Premium / Luxury' },
+  { value: 'witty', label: 'Witty / Humorous' },
+  { value: 'persuasive', label: 'Persuasive' },
+  { value: 'technical', label: 'Technical / Informative' },
+  { value: 'playful', label: 'Playful' },
+  { value: 'formal', label: 'Formal' },
+  { value: 'empathetic', label: 'Empathetic' },
 ];
 
 export const LANGUAGES = [

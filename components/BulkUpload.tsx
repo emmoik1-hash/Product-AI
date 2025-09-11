@@ -7,6 +7,12 @@ import { LANGUAGES, TONES } from '../constants';
 import { UploadIcon } from './icons/UploadIcon';
 import { FileSpreadsheetIcon } from './icons/FileSpreadsheetIcon';
 
+// Note: Usage count for bulk uploads will be handled at the App level.
+// This component will simply receive a prop to disable functionality.
+interface BulkUploadProps {
+  isLimitReached: boolean;
+}
+
 const parseExcel = (file: File): Promise<BulkProductInfo[]> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -37,7 +43,7 @@ const parseExcel = (file: File): Promise<BulkProductInfo[]> => {
     });
 };
 
-export const BulkUpload: React.FC = () => {
+export const BulkUpload: React.FC<BulkUploadProps> = ({ isLimitReached }) => {
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
@@ -72,6 +78,10 @@ export const BulkUpload: React.FC = () => {
   };
 
   const handleProcess = async () => {
+    if (isLimitReached) {
+        setError("Bạn đã hết lượt dùng thử. Vui lòng đăng ký để tiếp tục.");
+        return;
+    }
     if (!file) {
       setError('Please select a file to process.');
       return;
@@ -100,6 +110,10 @@ export const BulkUpload: React.FC = () => {
           return;
         }
         
+        // In a real scenario, you would increment usage count here in the parent component
+        // For now, we assume one bulk upload costs one "credit".
+        // The check is already done at the beginning of this function.
+
         setProgress({ current: 0, total: products.length });
 
         const newResults: BulkResult[] = [];
@@ -318,11 +332,17 @@ export const BulkUpload: React.FC = () => {
        </div>
       
       {error && <p className="mt-4 text-red-400 text-center">{error}</p>}
+      
+      {isLimitReached && (
+        <div className="text-center mt-4 p-3 bg-amber-900/50 border border-amber-600 text-amber-300 rounded-md text-sm">
+          Bạn đã hết 3 lượt dùng thử miễn phí. Vui lòng đăng ký tài khoản để tiếp tục sử dụng.
+        </div>
+      )}
 
       <div className="mt-8">
         <button
           onClick={handleProcess}
-          disabled={!file || isProcessing}
+          disabled={!file || isProcessing || isLimitReached}
           className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3 px-4 rounded-md transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
         >
           Process File

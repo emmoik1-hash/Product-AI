@@ -6,9 +6,10 @@ import { SparklesIcon } from './icons/SparklesIcon';
 interface InputFormProps {
   onGenerate: (productInfo: ProductInfo) => void;
   isLoading: boolean;
+  isLimitReached: boolean;
 }
 
-export const InputForm: React.FC<InputFormProps> = ({ onGenerate, isLoading }) => {
+export const InputForm: React.FC<InputFormProps> = ({ onGenerate, isLoading, isLimitReached }) => {
   const [productName, setProductName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [tone, setTone] = useState<string>(TONES[0].value);
@@ -16,6 +17,10 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, isLoading }) =
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLimitReached) {
+        alert("Bạn đã hết lượt dùng thử. Vui lòng đăng ký để tiếp tục.");
+        return;
+    }
     if (!productName.trim() || !description.trim()) {
       alert("Please provide a product name and a description/details for the AI to analyze.");
       return;
@@ -98,8 +103,8 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, isLoading }) =
 
       <button
         type="submit"
-        disabled={isLoading}
-        className="w-full flex justify-center items-center space-x-2 bg-primary hover:bg-primary-hover text-white font-bold py-3 px-4 rounded-md transition-all duration-300 disabled:bg-gray-500 disabled:cursor-wait"
+        disabled={isLoading || isLimitReached}
+        className="w-full flex justify-center items-center space-x-2 bg-primary hover:bg-primary-hover text-white font-bold py-3 px-4 rounded-md transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
       >
         {isLoading ? (
           <>
@@ -116,6 +121,11 @@ export const InputForm: React.FC<InputFormProps> = ({ onGenerate, isLoading }) =
           </>
         )}
       </button>
+      {isLimitReached && (
+        <div className="text-center mt-4 p-3 bg-amber-900/50 border border-amber-600 text-amber-300 rounded-md text-sm">
+          Bạn đã hết 3 lượt dùng thử miễn phí. Vui lòng đăng ký tài khoản để tiếp tục sử dụng.
+        </div>
+      )}
     </form>
   );
 };

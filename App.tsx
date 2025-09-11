@@ -1,35 +1,65 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { InputForm } from './components/InputForm';
 import { OutputDisplay } from './components/OutputDisplay';
 import { BulkUpload } from './components/BulkUpload';
 import { generateProductDescriptions } from './services/geminiService';
 import type { GenerateApiResponse, ProductInfo } from './types';
+import { FeedbackButton } from './components/FeedbackButton';
+import { ContactForm } from './components/ContactForm';
+
+const USAGE_LIMIT = 3;
+const USAGE_COUNT_KEY = 'productAiUsageCount';
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [generatedData, setGeneratedData] = useState<GenerateApiResponse | null>(null);
-  const [mode, setMode] = useState<'single' | 'bulk'>('single');
+  const [mode, setMode] = useState<'single' | 'bulk' | 'contact'>('single');
+  const [usageCount, setUsageCount] = useState<number>(0);
+
+  useEffect(() => {
+    try {
+      const storedCount = localStorage.getItem(USAGE_COUNT_KEY);
+      setUsageCount(storedCount ? parseInt(storedCount, 10) : 0);
+    } catch (e) {
+      console.error("Could not read usage count from localStorage", e);
+      setUsageCount(0);
+    }
+  }, []);
+
+  const isLimitReached = usageCount >= USAGE_LIMIT;
 
   const handleGenerate = useCallback(async (productInfo: ProductInfo) => {
+    if (isLimitReached) {
+      setError("Bạn đã hết lượt dùng thử. Vui lòng đăng ký để tiếp tục.");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setGeneratedData(null);
     try {
       const result = await generateProductDescriptions(productInfo);
       setGeneratedData(result);
+      const newCount = usageCount + 1;
+      setUsageCount(newCount);
+      localStorage.setItem(USAGE_COUNT_KEY, newCount.toString());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
       console.error(err);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [usageCount, isLimitReached]);
 
   const renderSingleMode = () => (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
       <div className="bg-neutral-800 p-6 rounded-xl shadow-lg">
-        <InputForm onGenerate={handleGenerate} isLoading={isLoading} />
+        <InputForm 
+          onGenerate={handleGenerate} 
+          isLoading={isLoading} 
+          isLimitReached={isLimitReached} 
+        />
       </div>
       <div className="bg-neutral-800 p-6 rounded-xl shadow-lg sticky top-8">
         <OutputDisplay 
@@ -40,6 +70,19 @@ const App: React.FC = () => {
       </div>
     </div>
   );
+
+  const renderContent = () => {
+    switch(mode) {
+      case 'single':
+        return renderSingleMode();
+      case 'bulk':
+        return <BulkUpload isLimitReached={isLimitReached} />;
+      case 'contact':
+        return <ContactForm />;
+      default:
+        return renderSingleMode();
+    }
+  }
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white font-sans">
@@ -61,7 +104,7 @@ const App: React.FC = () => {
 
       <main className="max-w-7xl mx-auto p-4 md:p-8">
         <div className="mb-8">
-          <div className="flex space-x-1 bg-neutral-800 p-1 rounded-lg max-w-xs mx-auto md:max-w-sm">
+          <div className="flex space-x-1 bg-neutral-800 p-1 rounded-lg max-w-md mx-auto">
             <button
               onClick={() => setMode('single')}
               className={`w-full py-2.5 text-sm font-medium leading-5 rounded-lg transition-colors duration-200 
@@ -76,12 +119,20 @@ const App: React.FC = () => {
             >
               Bulk Upload
             </button>
+            <button
+              onClick={() => setMode('contact')}
+              className={`w-full py-2.5 text-sm font-medium leading-5 rounded-lg transition-colors duration-200 
+                ${mode === 'contact' ? 'bg-primary text-white shadow' : 'text-gray-300 hover:bg-white/[0.12] hover:text-white'}`}
+            >
+              Liên hệ
+            </button>
           </div>
         </div>
         <div key={mode} className="animate-fade-in">
-          {mode === 'single' ? renderSingleMode() : <BulkUpload />}
+          {renderContent()}
         </div>
       </main>
+      <FeedbackButton />
     </div>
   );
 };
