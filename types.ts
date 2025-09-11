@@ -1,4 +1,3 @@
-
 export type ContentType = 'product_description' | 'social_media_post';
 
 export interface ProductInfo {
@@ -43,4 +42,10 @@ export interface BulkResult extends BulkProductInfo {
   meta_description?: string;
   keywords?: string;
   error?: string;
+}
+
+export interface Profile {
+  id: string; // Corresponds to the user's ID in Supabase auth
+  email: string;
+  usage_count: number;
 }

@@ -92,5 +92,20 @@
   "contentTypes": {
     "product_description": "Product Description",
     "social_media_post": "Social Media Post"
+  },
+  "auth": {
+    "login": "Log In",
+    "signup": "Sign Up",
+    "logout": "Log Out",
+    "loading": "Loading...",
+    "createAccount": "Create Account",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "you@example.com",
+    "emailRequiredError": "Email address is required.",
+    "loginError": "No account found with that email. Please sign up.",
+    "signupError": "An account with that email already exists. Please log in.",
+    "usage": "{used}/{limit} uses",
+    "getStarted": "Get Started",
+    "loginPrompt": "Please sign up or log in to generate content."
   }
 }

@@ -92,5 +92,20 @@
   "contentTypes": {
     "product_description": "Mô tả sản phẩm",
     "social_media_post": "Bài đăng mạng xã hội"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "signup": "Đăng ký",
+    "logout": "Đăng xuất",
+    "loading": "Đang tải...",
+    "createAccount": "Tạo tài khoản",
+    "emailLabel": "Địa chỉ Email",
+    "emailPlaceholder": "ban@example.com",
+    "emailRequiredError": "Vui lòng nhập địa chỉ email.",
+    "loginError": "Không tìm thấy tài khoản với email này. Vui lòng đăng ký.",
+    "signupError": "Một tài khoản với email này đã tồn tại. Vui lòng đăng nhập.",
+    "usage": "{used}/{limit} lượt",
+    "getStarted": "Bắt đầu",
+    "loginPrompt": "Vui lòng đăng ký hoặc đăng nhập để tạo nội dung."
   }
 }
