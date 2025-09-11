@@ -1,4 +1,6 @@
 
+import { ContentType } from "./types";
+
 export const TONES = [
   { value: 'professional', label: 'Professional' },
   { value: 'friendly', label: 'Friendly' },
@@ -18,4 +20,9 @@ export const LANGUAGES = [
   { value: 'es', label: 'Spanish (ES)' },
   { value: 'jp', label: 'Japanese (JP)' },
   { value: 'de', label: 'German (DE)' },
+];
+
+export const CONTENT_TYPES: {value: ContentType, label: string}[] = [
+    { value: 'product_description', label: 'Product Description' },
+    { value: 'social_media_post', label: 'Social Media Post' },
 ];

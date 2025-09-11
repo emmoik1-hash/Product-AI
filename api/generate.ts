@@ -1,23 +1,17 @@
-// File: api/generate.ts
-// This is a Vercel serverless function.
-// It acts as a secure proxy to the Gemini API.
 
+// File: api/generate.ts
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenAI, Type } from "@google/genai";
+import type { ContentType, ProductInfo } from '../types';
 
-// The API key is securely accessed from Vercel's environment variables.
-// It is NEVER exposed to the client. The name is changed to GEMINI_API_KEY
-// to be consistent with Vercel's environment variable settings.
 const API_KEY = process.env.GEMINI_API_KEY;
-
 if (!API_KEY) {
-  // This will cause the function to fail safely if the key is not configured.
   throw new Error("GEMINI_API_KEY environment variable not set on the server.");
 }
-
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
-const responseSchema = {
+// --- Response Schemas ---
+const productDescriptionSchema = {
   type: Type.OBJECT,
   properties: {
     descriptions: {
@@ -28,81 +22,119 @@ const responseSchema = {
     seo: {
       type: Type.OBJECT,
       properties: {
-        metaTitle: {
-          type: Type.STRING,
-          description: "An SEO-optimized meta title for the product page.",
-        },
-        metaDescription: {
-          type: Type.STRING,
-          description: "An SEO-optimized meta description for the product page.",
-        },
-        keywords: {
-          type: Type.ARRAY,
-          items: { type: Type.STRING },
-          description: "An array of relevant keywords for SEO.",
-        },
+        metaTitle: { type: Type.STRING, description: "An SEO-optimized meta title." },
+        metaDescription: { type: Type.STRING, description: "An SEO-optimized meta description." },
+        keywords: { type: Type.ARRAY, items: { type: Type.STRING }, description: "An array of relevant SEO keywords." },
       },
       required: ["metaTitle", "metaDescription", "keywords"],
     },
+    featureBullets: { type: Type.ARRAY, items: { type: Type.STRING }, description: "3-5 compelling bullet points highlighting key features and benefits." },
+    targetAudience: { type: Type.STRING, description: "A brief description of the ideal target audience." },
+    callToActions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "2-3 strong call-to-action phrases." },
+    hashtags: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Relevant social media hashtags, without the '#' symbol." }
   },
-  required: ["descriptions", "seo"],
+  required: ["descriptions", "seo", "featureBullets", "targetAudience", "callToActions", "hashtags"],
 };
 
+const socialMediaPostSchema = {
+    type: Type.OBJECT,
+    properties: {
+        socialMediaPosts: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+            description: "An array of 2-3 distinct and engaging social media posts about the product."
+        }
+    },
+    required: ["socialMediaPosts"],
+};
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
-) {
-  // We only want to handle POST requests to this endpoint.
+// --- Main Handler ---
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
   try {
-    const { productName, description, tone, language } = req.body;
+    const { productName, description, tone, language, contentType, imageData, imageMimeType } = req.body as ProductInfo;
 
-    // Basic validation to ensure we have the data we need.
-    if (!productName || !description || !tone || !language) {
+    if (!productName || !description || !tone || !language || !contentType) {
         return res.status(400).json({ error: "Missing required product information." });
     }
+    
+    let prompt: string;
+    let schema;
+    let modelContents: any; // Can be string or array of parts
 
-    const prompt = `
-      You are an expert e-commerce copywriter and SEO specialist.
-      Your task is to analyze an existing product description, identify its key features, and then generate improved, compelling product descriptions and SEO metadata.
+    switch (contentType) {
+      case 'social_media_post':
+        prompt = `
+          You are a professional social media manager specializing in e-commerce.
+          Your task is to create engaging social media posts for a product.
 
-      Analyze this existing product information:
-      - Product Name: ${productName}
-      - Existing Description / Details to Analyze: ${description}
+          Product Information:
+          - Product Name: ${productName}
+          - Details/Keywords: ${description}
 
-      Your goal is to rewrite and improve upon this. Follow these instructions carefully:
-      1.  From the provided details, generate 2-3 new, distinct, and engaging product descriptions.
-      2.  Adopt the following tone of voice: ${tone}.
-      3.  Create a concise, SEO-friendly meta title for the product.
-      4.  Write a compelling meta description that encourages clicks.
-      5.  Provide a list of relevant keywords based on the product.
-      6.  Ensure all generated content is in the specified target language: ${language}.
-    `;
+          Instructions:
+          1.  Generate 2-3 short, catchy, and distinct social media posts.
+          2.  Incorporate relevant emojis and a call-to-action in each post.
+          3.  Adopt a '${tone}' tone of voice.
+          4.  Ensure all content is in the specified language: '${language}'.
+        `;
+        schema = socialMediaPostSchema;
+        modelContents = prompt;
+        break;
+
+      case 'product_description':
+      default:
+        prompt = `
+          You are an expert e-commerce copywriter, SEO specialist, and marketing strategist.
+          Your task is to analyze product information (and an optional image) to generate a complete marketing kit.
+
+          Analyze this product:
+          - Product Name: ${productName}
+          - Existing Description / Details / Keywords: ${description}
+          ${imageData ? '- An image of the product is also provided for visual analysis.' : ''}
+
+          Instructions:
+          1.  **Product Descriptions:** Generate 2-3 distinct and engaging product descriptions.
+          2.  **SEO Metadata:** Create an SEO-friendly meta title, meta description, and keywords list.
+          3.  **Feature Bullets:** Write 3-5 compelling bullet points, linking features to benefits.
+          4.  **Target Audience:** Briefly describe the ideal customer.
+          5.  **Call to Actions (CTAs):** Suggest 2-3 strong, action-oriented phrases.
+          6.  **Social Media Hashtags:** Provide relevant hashtags (without the '#').
+          7.  **Tone and Language:** Adopt a '${tone}' tone and write everything in '${language}'.
+        `;
+        schema = productDescriptionSchema;
+        
+        if (imageData && imageMimeType) {
+            const imagePart = { inlineData: { mimeType: imageMimeType, data: imageData } };
+            const textPart = { text: prompt };
+            modelContents = { parts: [textPart, imagePart] };
+        } else {
+            modelContents = prompt;
+        }
+        break;
+    }
 
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
-        contents: prompt,
+        contents: modelContents,
         config: {
             responseMimeType: "application/json",
-            responseSchema: responseSchema,
+            responseSchema: schema,
         },
     });
     
     const text = response.text.trim();
-    // Since the model is configured to return JSON, we parse it before sending.
     const data = JSON.parse(text);
 
-    // Send the successful response back to the frontend.
     return res.status(200).json(data);
 
   } catch (error) {
     console.error("Error in Vercel function calling Gemini API:", error);
-    // Send a generic error message back to the frontend.
-    return res.status(500).json({ error: "Failed to generate descriptions from the backend." });
+    const errorMessage = error instanceof Error ? error.message : "Failed to generate content from the backend.";
+    return res.status(500).json({ error: errorMessage });
   }
 }

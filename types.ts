@@ -1,8 +1,14 @@
+
+export type ContentType = 'product_description' | 'social_media_post';
+
 export interface ProductInfo {
   productName: string;
   description: string;
   tone: string;
   language: string;
+  contentType: ContentType;
+  imageData?: string; // base64 encoded image
+  imageMimeType?: string;
 }
 
 export interface SeoData {
@@ -12,8 +18,15 @@ export interface SeoData {
 }
 
 export interface GenerateApiResponse {
-  descriptions: string[];
-  seo: SeoData;
+  // Fields for Product Description
+  descriptions?: string[];
+  seo?: SeoData;
+  featureBullets?: string[];
+  targetAudience?: string;
+  callToActions?: string[];
+  hashtags?: string[];
+  // Fields for Social Media Post
+  socialMediaPosts?: string[];
 }
 
 // For Bulk Upload

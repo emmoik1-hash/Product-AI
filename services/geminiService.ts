@@ -1,14 +1,14 @@
-// services/geminiService.ts
+
 import type { GenerateApiResponse, ProductInfo } from "../types";
 
 /**
  * Sends product information to our secure backend API proxy, which then calls the Gemini API.
- * This function no longer calls the Gemini API directly, protecting the API key.
- * @param productInfo - The product data to be sent for description generation.
- * @returns A promise that resolves to the generated descriptions and SEO data.
+ * This function handles different content types and optional image data.
+ * @param contentInfo - The product and content generation data.
+ * @returns A promise that resolves to the generated content.
  */
-export async function generateProductDescriptions(
-  productInfo: ProductInfo
+export async function generateContent(
+  contentInfo: ProductInfo
 ): Promise<GenerateApiResponse> {
 
   try {
@@ -18,7 +18,7 @@ export async function generateProductDescriptions(
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(productInfo),
+      body: JSON.stringify(contentInfo),
     });
 
     if (!response.ok) {
@@ -41,7 +41,7 @@ export async function generateProductDescriptions(
     const data = await response.json();
 
     // Basic validation on the response from our proxy.
-    if (!data.descriptions || !data.seo) {
+    if (typeof data !== 'object' || data === null) {
         throw new Error("Invalid response structure from our API proxy.");
     }
 

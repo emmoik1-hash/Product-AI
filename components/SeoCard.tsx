@@ -30,7 +30,7 @@ export const SeoCard: React.FC<SeoCardProps> = ({ title, content }) => {
           } transition-all`}
         >
           {copied ? <CheckIcon /> : <CopyIcon />}
-          <span>{copied ? 'Copied!' : 'Copy'}</span>
+          <span>{copied ? "Copied!" : "Copy"}</span>
         </button>
       </div>
       <p className="text-gray-200">{content}</p>

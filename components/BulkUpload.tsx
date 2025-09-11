@@ -1,14 +1,14 @@
+
 import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
-import { generateProductDescriptions } from '../services/geminiService';
+import { generateContent } from '../services/geminiService';
 import { parseCSV, generateCSV } from '../utils/csv';
 import type { BulkProductInfo, BulkResult, ProductInfo } from '../types';
-import { LANGUAGES, TONES } from '../constants';
+import { TONES } from '../constants';
 import { UploadIcon } from './icons/UploadIcon';
 import { FileSpreadsheetIcon } from './icons/FileSpreadsheetIcon';
 
-// Note: Usage count for bulk uploads will be handled at the App level.
-// This component will simply receive a prop to disable functionality.
+
 interface BulkUploadProps {
   isLimitReached: boolean;
 }
@@ -52,14 +52,13 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({ isLimitReached }) => {
   const [currentProduct, setCurrentProduct] = useState<string>('');
   
   const [tone, setTone] = useState<string>(TONES[0].value);
-  const [language, setLanguage] = useState<string>(LANGUAGES[0].value);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files[0]) {
       const fileName = files[0].name.toLowerCase();
       if (!fileName.endsWith('.csv') && !fileName.endsWith('.xlsx')) {
-        setError('Invalid file type. Please upload a CSV or XLSX file.');
+        setError("Invalid file type. Please upload a CSV or XLSX file.");
         setFile(null);
         return;
       }
@@ -79,11 +78,11 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({ isLimitReached }) => {
 
   const handleProcess = async () => {
     if (isLimitReached) {
-        setError("Bạn đã hết lượt dùng thử. Vui lòng đăng ký để tiếp tục.");
+        setError("You have reached your free usage limit. Please register to continue.");
         return;
     }
     if (!file) {
-      setError('Please select a file to process.');
+      setError("Please select a file to process.");
       return;
     }
 
@@ -105,14 +104,10 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({ isLimitReached }) => {
         }
 
         if (products.length === 0) {
-          setError('File is empty or invalid. Make sure it contains "product_name" and "description" columns.');
+          setError("File is empty or invalid. Make sure it contains \"product_name\" and \"description\" columns.");
           setIsProcessing(false);
           return;
         }
-        
-        // In a real scenario, you would increment usage count here in the parent component
-        // For now, we assume one bulk upload costs one "credit".
-        // The check is already done at the beginning of this function.
 
         setProgress({ current: 0, total: products.length });
 
@@ -126,19 +121,20 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({ isLimitReached }) => {
             productName: product.product_name,
             description: product.description,
             tone,
-            language,
+            language: 'en', // Default to English for all bulk items
+            contentType: 'product_description', // Bulk only supports product descriptions for now
           };
           
           try {
-            const apiResponse = await generateProductDescriptions(productInfo);
+            const apiResponse = await generateContent(productInfo);
             const result: BulkResult = {
               ...product,
-              generated_description_1: apiResponse.descriptions[0] || '',
-              generated_description_2: apiResponse.descriptions[1] || '',
-              generated_description_3: apiResponse.descriptions[2] || '',
-              meta_title: apiResponse.seo.metaTitle,
-              meta_description: apiResponse.seo.metaDescription,
-              keywords: apiResponse.seo.keywords.join(', '),
+              generated_description_1: apiResponse.descriptions?.[0] || '',
+              generated_description_2: apiResponse.descriptions?.[1] || '',
+              generated_description_3: apiResponse.descriptions?.[2] || '',
+              meta_title: apiResponse.seo?.metaTitle,
+              meta_description: apiResponse.seo?.metaDescription,
+              keywords: apiResponse.seo?.keywords.join(', '),
             };
             newResults.push(result);
           } catch (err) {
@@ -208,7 +204,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({ isLimitReached }) => {
       return (
         <div className="bg-neutral-800 p-8 rounded-xl shadow-lg text-center">
             <h2 className="text-2xl font-bold mb-4">Processing in Progress...</h2>
-            <p className="text-gray-400 mb-2">Generating content for: <span className="font-semibold text-white">{currentProduct}</span></p>
+            <p className="text-gray-400 mb-2">{`Generating content for: ${currentProduct}`}</p>
             <div className="w-full bg-neutral-700 rounded-full h-4 mb-4 overflow-hidden">
                 <div 
                     className="bg-primary h-4 rounded-full transition-all duration-300" 
@@ -226,7 +222,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({ isLimitReached }) => {
       return (
         <div className="bg-neutral-800 p-8 rounded-xl shadow-lg text-center max-w-3xl mx-auto">
              <h2 className="text-2xl font-bold mb-2">Processing Complete!</h2>
-             <p className="text-gray-300 mb-6">Successfully generated descriptions for {successes.length} of {results.length} products.</p>
+             <p className="text-gray-300 mb-6">{`Successfully generated descriptions for ${successes.length} of ${results.length} products.`}</p>
              <div className="flex flex-wrap justify-center gap-4">
                 <button
                     onClick={handleDownloadCSV}
@@ -252,7 +248,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({ isLimitReached }) => {
              
             {failures.length > 0 && (
                 <div className="mt-8 text-left bg-neutral-900/50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-red-400 mb-3">Failed Products ({failures.length}):</h3>
+                    <h3 className="font-semibold text-red-400 mb-3">{`Failed Products (${failures.length}):`}</h3>
                     <ul className="space-y-2 max-h-48 overflow-y-auto text-sm">
                         {failures.map((fail, index) => (
                             <li key={index} className="p-2 bg-neutral-700/50 rounded">
@@ -272,8 +268,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({ isLimitReached }) => {
       <h2 className="text-2xl font-bold mb-2">Bulk Generate Descriptions</h2>
       <p className="text-gray-400 mb-6">Upload a CSV or XLSX file with `product_name` and `description` columns to generate content for multiple products at once.</p>
       
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div>
+       <div className="mb-6">
           <label htmlFor="tone-bulk" className="block text-sm font-medium text-gray-300 mb-2">
             Tone of Voice (for all products)
           </label>
@@ -290,24 +285,6 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({ isLimitReached }) => {
             ))}
           </select>
         </div>
-        <div>
-          <label htmlFor="language-bulk" className="block text-sm font-medium text-gray-300 mb-2">
-            Language (for all products)
-          </label>
-          <select
-            id="language-bulk"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="w-full bg-neutral-700 border border-neutral-600 rounded-md px-3 py-2 text-white focus:ring-primary focus:border-primary"
-          >
-            {LANGUAGES.map((l) => (
-              <option key={l.value} value={l.value}>
-                {l.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
       
       <div className="border-2 border-dashed border-neutral-600 rounded-lg p-8 text-center">
         <UploadIcon />
@@ -319,7 +296,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({ isLimitReached }) => {
           onChange={handleFileChange}
         />
         <label htmlFor="file-upload" className="mt-4 font-semibold text-primary hover:text-primary-hover cursor-pointer">
-          {file ? `Selected: ${file.name}` : 'Click to upload or drag and drop'}
+          {file ? `${file.name}` : "Click to upload or drag and drop"}
         </label>
         <p className="text-xs text-gray-500 mt-1">CSV or XLSX file up to 10MB</p>
       </div>
@@ -335,7 +312,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({ isLimitReached }) => {
       
       {isLimitReached && (
         <div className="text-center mt-4 p-3 bg-amber-900/50 border border-amber-600 text-amber-300 rounded-md text-sm">
-          Bạn đã hết 3 lượt dùng thử miễn phí. Vui lòng đăng ký tài khoản để tiếp tục sử dụng.
+          You have reached your free usage limit. Please register to continue.
         </div>
       )}
 

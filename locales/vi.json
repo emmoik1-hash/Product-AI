@@ -1,0 +1,96 @@
+
+{
+  "header": {
+    "title": "AI Tạo Mô Tả Sản Phẩm",
+    "poweredBy": "Phát triển bởi Gemini"
+  },
+  "tabs": {
+    "single": "Sản phẩm đơn lẻ",
+    "bulk": "Tải lên hàng loạt",
+    "contact": "Liên hệ"
+  },
+  "inputForm": {
+    "productNameLabel": "Tên sản phẩm",
+    "productNamePlaceholder": "Ví dụ: Bình giữ nhiệt thông minh",
+    "descriptionLabel": "Chi tiết sản phẩm / Từ khóa",
+    "descriptionPlaceholder": "Dán mô tả sản phẩm, tính năng, hoặc các từ khóa hiện có của bạn vào đây. AI sẽ phân tích văn bản này để tạo ra nội dung mới.",
+    "contentTypeLabel": "Loại nội dung",
+    "toneLabel": "Văn phong",
+    "languageLabel": "Ngôn ngữ",
+    "imageUploadLabel": "Tải ảnh sản phẩm (Tùy chọn)",
+    "imageUploadText": "Nhấn để tải ảnh lên",
+    "imageChangeText": "Thay đổi ảnh",
+    "imageRemoveText": "Xóa",
+    "generateButton": "Tạo nội dung",
+    "generatingButton": "Đang tạo...",
+    "limitReachedError": "Bạn đã hết lượt dùng thử miễn phí. Vui lòng đăng ký để tiếp tục sử dụng.",
+    "formValidationError": "Vui lòng cung cấp tên sản phẩm và một vài chi tiết để AI phân tích."
+  },
+  "outputDisplay": {
+    "placeholderTitle": "Chờ nội dung nhập vào",
+    "placeholderText": "Nội dung được tạo sẽ xuất hiện ở đây sau khi bạn điền vào biểu mẫu và nhấp vào \"Tạo\".",
+    "loadingText": "Đang tạo nội dung, vui lòng đợi...",
+    "errorTitle": "Đã xảy ra lỗi",
+    "descriptionsTitle": "Các mô tả được tạo",
+    "descriptionVersion": "Phiên bản {index}",
+    "marketingToolkitTitle": "Bộ công cụ Marketing",
+    "seoSuggestionsTitle": "Gợi ý SEO",
+    "socialPostsTitle": "Bài đăng mạng xã hội đã tạo",
+    "postVersion": "Lựa chọn {index}",
+    "featureBullets": "Gạch đầu dòng tính năng",
+    "callToActions": "Kêu gọi hành động",
+    "targetAudience": "Đối tượng khách hàng",
+    "hashtags": "Hashtag mạng xã hội",
+    "metaTitle": "Tiêu đề meta",
+    "metaDescription": "Mô tả meta",
+    "keywords": "Từ khóa"
+  },
+  "bulkUpload": {
+    "title": "Tạo mô tả hàng loạt",
+    "description": "Tải lên tệp CSV hoặc XLSX có cột `product_name` và `description` để tạo nội dung cho nhiều sản phẩm cùng lúc.",
+    "toneLabel": "Văn phong (cho tất cả sản phẩm)",
+    "languageLabel": "Ngôn ngữ (cho tất cả sản phẩm)",
+    "fileUploadLabel": "Nhấn để tải lên hoặc kéo và thả",
+    "fileUploadHint": "Tệp CSV hoặc XLSX tối đa 10MB",
+    "downloadTemplate": "Tải mẫu CSV",
+    "processButton": "Xử lý tệp",
+    "processingTitle": "Đang xử lý...",
+    "processingText": "Đang tạo nội dung cho: {productName}",
+    "completeTitle": "Hoàn tất xử lý!",
+    "completeText": "Đã tạo thành công mô tả cho {successCount} trên {totalCount} sản phẩm.",
+    "downloadCsv": "Tải xuống CSV",
+    "downloadExcel": "Tải xuống Excel (.xlsx)",
+    "startOver": "Làm lại từ đầu",
+    "failedProducts": "Sản phẩm thất bại ({failCount}):",
+    "invalidFileError": "Loại tệp không hợp lệ. Vui lòng tải lên tệp CSV hoặc XLSX.",
+    "selectFileError": "Vui lòng chọn một tệp để xử lý.",
+    "emptyFileError": "Tệp trống hoặc không hợp lệ. Hãy chắc chắn rằng tệp chứa các cột \"product_name\" và \"description\"."
+  },
+  "contactForm": {
+    "title": "Liên hệ với chúng tôi",
+    "description": "Chúng tôi rất mong nhận được phản hồi và câu hỏi từ bạn.",
+    "nameLabel": "Họ và tên",
+    "namePlaceholder": "Nhập tên của bạn",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "messageLabel": "Nội dung",
+    "messagePlaceholder": "Nội dung bạn muốn trao đổi...",
+    "submitButton": "Gửi liên hệ",
+    "submittingButton": "Đang gửi...",
+    "successMessage": "Cảm ơn bạn đã đóng góp!",
+    "errorMessage": "Lỗi: {error}"
+  },
+  "feedbackButton": {
+    "tooltip": "Gửi phản hồi",
+    "ariaLabel": "Gửi phản hồi về ứng dụng"
+  },
+  "common": {
+    "copy": "Sao chép",
+    "copied": "Đã sao chép!",
+    "copyList": "Chép danh sách"
+  },
+  "contentTypes": {
+    "product_description": "Mô tả sản phẩm",
+    "social_media_post": "Bài đăng mạng xã hội"
+  }
+}

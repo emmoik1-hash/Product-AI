@@ -3,24 +3,28 @@ import React, { useState } from 'react';
 import { CopyIcon } from './icons/CopyIcon';
 import { CheckIcon } from './icons/CheckIcon';
 
-interface DescriptionCardProps {
+interface InfoCardProps {
   title: string;
-  text: string;
+  content: string;
+  icon: React.ReactNode;
 }
 
-export const DescriptionCard: React.FC<DescriptionCardProps> = ({ title, text }) => {
+export const InfoCard: React.FC<InfoCardProps> = ({ title, content, icon }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText(content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
+  
   return (
-    <div className="bg-neutral-900 p-4 rounded-lg border border-neutral-700 transition-all duration-300 hover:border-primary hover:shadow-lg hover:shadow-primary/10">
+    <div className="bg-neutral-900 p-4 rounded-lg border border-neutral-700 transition-all duration-300 hover:border-primary hover:shadow-lg hover:shadow-primary/10 flex flex-col">
       <div className="flex justify-between items-start mb-2">
-        <h4 className="font-semibold text-gray-300">{title}</h4>
+        <div className="flex items-center space-x-2">
+          <div className="text-primary-light">{icon}</div>
+          <h5 className="font-medium text-gray-400">{title}</h5>
+        </div>
         <button
           onClick={handleCopy}
           className={`flex items-center space-x-1.5 text-xs px-2 py-1 rounded ${
@@ -33,7 +37,7 @@ export const DescriptionCard: React.FC<DescriptionCardProps> = ({ title, text })
           <span>{copied ? "Copied!" : "Copy"}</span>
         </button>
       </div>
-      <p className="text-gray-400 whitespace-pre-wrap">{text}</p>
+      <p className="text-gray-200 text-sm mt-1 flex-grow">{content}</p>
     </div>
   );
 };

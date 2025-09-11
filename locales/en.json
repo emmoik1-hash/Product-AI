@@ -1,0 +1,96 @@
+
+{
+  "header": {
+    "title": "Product Descriptions AI",
+    "poweredBy": "Powered by Gemini"
+  },
+  "tabs": {
+    "single": "Single Product",
+    "bulk": "Bulk Upload",
+    "contact": "Contact"
+  },
+  "inputForm": {
+    "productNameLabel": "Product Name",
+    "productNamePlaceholder": "e.g., Smart Thermos Bottle",
+    "descriptionLabel": "Product Details / Keywords",
+    "descriptionPlaceholder": "Paste your existing product description, features, or keywords here. The AI will analyze this text to generate new content.",
+    "contentTypeLabel": "Content Type",
+    "toneLabel": "Tone of Voice",
+    "languageLabel": "Language",
+    "imageUploadLabel": "Upload Product Image (Optional)",
+    "imageUploadText": "Click to upload an image",
+    "imageChangeText": "Change Image",
+    "imageRemoveText": "Remove",
+    "generateButton": "Generate Content",
+    "generatingButton": "Generating...",
+    "limitReachedError": "You have reached your free usage limit. Please register to continue.",
+    "formValidationError": "Please provide a product name and some details for the AI to analyze."
+  },
+  "outputDisplay": {
+    "placeholderTitle": "Awaiting Input",
+    "placeholderText": "Your generated content will appear here once you fill out the form and click \"Generate\".",
+    "loadingText": "Generating content, please wait...",
+    "errorTitle": "An Error Occurred",
+    "descriptionsTitle": "Generated Descriptions",
+    "descriptionVersion": "Version {index}",
+    "marketingToolkitTitle": "Marketing Toolkit",
+    "seoSuggestionsTitle": "SEO Suggestions",
+    "socialPostsTitle": "Generated Social Media Posts",
+    "postVersion": "Post Option {index}",
+    "featureBullets": "Feature Bullets",
+    "callToActions": "Call to Actions",
+    "targetAudience": "Target Audience",
+    "hashtags": "Social Media Hashtags",
+    "metaTitle": "Meta Title",
+    "metaDescription": "Meta Description",
+    "keywords": "Keywords"
+  },
+  "bulkUpload": {
+    "title": "Bulk Generate Descriptions",
+    "description": "Upload a CSV or XLSX file with `product_name` and `description` columns to generate content for multiple products at once.",
+    "toneLabel": "Tone of Voice (for all products)",
+    "languageLabel": "Language (for all products)",
+    "fileUploadLabel": "Click to upload or drag and drop",
+    "fileUploadHint": "CSV or XLSX file up to 10MB",
+    "downloadTemplate": "Download CSV Template",
+    "processButton": "Process File",
+    "processingTitle": "Processing in Progress...",
+    "processingText": "Generating content for: {productName}",
+    "completeTitle": "Processing Complete!",
+    "completeText": "Successfully generated descriptions for {successCount} of {totalCount} products.",
+    "downloadCsv": "Download CSV",
+    "downloadExcel": "Download Excel (.xlsx)",
+    "startOver": "Start Over",
+    "failedProducts": "Failed Products ({failCount}):",
+    "invalidFileError": "Invalid file type. Please upload a CSV or XLSX file.",
+    "selectFileError": "Please select a file to process.",
+    "emptyFileError": "File is empty or invalid. Make sure it contains \"product_name\" and \"description\" columns."
+  },
+  "contactForm": {
+    "title": "Contact Us",
+    "description": "We'd love to hear your feedback and questions.",
+    "nameLabel": "Full Name",
+    "namePlaceholder": "Enter your name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Your message here...",
+    "submitButton": "Send Message",
+    "submittingButton": "Sending...",
+    "successMessage": "Thank you for your contribution!",
+    "errorMessage": "Error: {error}"
+  },
+  "feedbackButton": {
+    "tooltip": "Send Feedback",
+    "ariaLabel": "Send feedback about the application"
+  },
+  "common": {
+    "copy": "Copy",
+    "copied": "Copied!",
+    "copyList": "Copy List"
+  },
+  "contentTypes": {
+    "product_description": "Product Description",
+    "social_media_post": "Social Media Post"
+  }
+}

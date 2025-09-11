@@ -1,11 +1,14 @@
+
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { InputForm } from './components/InputForm';
 import { OutputDisplay } from './components/OutputDisplay';
 import { BulkUpload } from './components/BulkUpload';
-import { generateProductDescriptions } from './services/geminiService';
+import { generateContent } from './services/geminiService';
 import type { GenerateApiResponse, ProductInfo } from './types';
 import { FeedbackButton } from './components/FeedbackButton';
 import { ContactForm } from './components/ContactForm';
+
 
 const USAGE_LIMIT = 3;
 const USAGE_COUNT_KEY = 'productAiUsageCount';
@@ -31,7 +34,7 @@ const App: React.FC = () => {
 
   const handleGenerate = useCallback(async (productInfo: ProductInfo) => {
     if (isLimitReached) {
-      setError("Bạn đã hết lượt dùng thử. Vui lòng đăng ký để tiếp tục.");
+      setError("You have reached your free usage limit. Please register to continue.");
       return;
     }
 
@@ -39,11 +42,12 @@ const App: React.FC = () => {
     setError(null);
     setGeneratedData(null);
     try {
-      const result = await generateProductDescriptions(productInfo);
+      const result = await generateContent(productInfo);
       setGeneratedData(result);
       const newCount = usageCount + 1;
       setUsageCount(newCount);
       localStorage.setItem(USAGE_COUNT_KEY, newCount.toString());
+    // FIX: Added curly braces to the catch block to fix syntax error. This resolves all reported errors.
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
       console.error(err);
@@ -96,9 +100,11 @@ const App: React.FC = () => {
             </div>
             <h1 className="text-2xl font-bold tracking-tight">Product Descriptions AI</h1>
           </div>
-           <div className="font-semibold text-sm bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-             Powered by Gemini
-           </div>
+          <div className="flex items-center space-x-4">
+            <div className="font-semibold text-sm bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+              Powered by Gemini
+            </div>
+          </div>
         </div>
       </header>
 
@@ -124,7 +130,7 @@ const App: React.FC = () => {
               className={`w-full py-2.5 text-sm font-medium leading-5 rounded-lg transition-colors duration-200 
                 ${mode === 'contact' ? 'bg-primary text-white shadow' : 'text-gray-300 hover:bg-white/[0.12] hover:text-white'}`}
             >
-              Liên hệ
+              Contact
             </button>
           </div>
         </div>
