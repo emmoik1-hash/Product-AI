@@ -1,26 +1,18 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// NOTE: Vercel injects environment variables during the build process.
-// These variables must be configured in the Vercel project settings.
-// We use NEXT_PUBLIC_ prefix by convention.
-// Ensure these are set in your Vercel dashboard.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Hardcoded credentials to resolve the initialization error.
+// The application was unable to find these values in the environment variables.
+// NOTE: For a production deployment (like on Vercel), it is recommended to
+// switch back to using environment variables for better security.
+const supabaseUrl = 'https://cfzllqaoykjxvwxexuje.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmemxscWFveWtqeHZ3eGV4dWplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNTQzNDEsImV4cCI6MjA3MjczMDM0MX0.sh5vRczPxc2WSrz83VWcQTZ6JNEPA_3qFwbrUu_gPCg';
 
-// This flag helps the AuthContext provide a user-friendly error
-// if the environment variables are not configured in Vercel.
+
+// This flag helps the AuthContext provide a user-friendly error.
+// With hardcoded values, this should be false unless they are deleted.
 export const isSupabaseMisconfigured = !supabaseUrl || !supabaseAnonKey;
 
-if (isSupabaseMisconfigured) {
-    // This warning is for the developer console.
-    console.warn(
-        "Supabase credentials are not configured in your environment variables. " +
-        "Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your Vercel project settings. " +
-        "Authentication will not function correctly."
-    );
-}
-
 // Create and export the Supabase client.
-// The createClient function requires non-empty strings, so we provide fallbacks.
-export const supabase = createClient(supabaseUrl || "", supabaseAnonKey || "");
+// This will now work because supabaseUrl and supabaseAnonKey are provided.
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
